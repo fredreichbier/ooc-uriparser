@@ -1,0 +1,5 @@
+Name: uriparser
+Description: RFC 3986 URI parsing library
+Includes: uriparser/Uri.h
+Libs: -luriparser
+SourcePath: .
