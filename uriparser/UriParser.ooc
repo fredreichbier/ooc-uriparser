@@ -26,9 +26,7 @@ ParserState: cover from ParserStateStruct* {
 TextRange: cover from UriTextRangeA {
     first, afterLast: extern const Char*
     copy: func -> String {
-        ret := String new(afterLast - first)
-        memcpy(ret, first, afterLast - first)
-        return ret
+        String new(first, (afterLast - first) as SizeT)
     }
 }
 
@@ -73,18 +71,20 @@ Uri: cover from UriStruct* {
     normalizeSyntaxEx: extern(uriNormalizeSyntaxExA) func (mask: UInt) -> ErrorCode 
     normalizeSyntaxMaskRequired: extern(uriNormalizeSyntaxMaskRequiredA) func -> UInt
     removeBase: extern(uriRemoveBaseUriA) func (absoluteSource, absoluteBase: const This, domainRootMode: Bool) -> UInt
-    toString: func (dest: String, maxChars: Int, charsWritten: Int*) -> ErrorCode {
-        return uriToStringA(dest, this, maxChars, charsWritten)
+    toString: func (dest: Buffer, maxChars: Int, charsWritten: Int*) -> ErrorCode {
+        ret := uriToStringA(dest data, this, maxChars, charsWritten) // TODO a bit dirty
+        dest size = charsWritten@
+        ret
     }
     /** return the uri as string or null in case of error */
     toString: func ~lazy -> String {
         charsRequired := toStringCharsRequired()
         if(charsRequired != -1) {
-            dest := String new(charsRequired)
+            dest := Buffer new(charsRequired)
             charsWritten: Int
             toString(dest, charsRequired, charsWritten&)
             /* TODO: can `charsWritten` be < charsRequired? */
-            return dest
+            return dest toString()
         } else {
             return null
         }

@@ -7,5 +7,5 @@ main: func {
     uri := Uri new()
     state@ uri = uri
     state parse("http://ooc-lang.org/hello/world.ooc?oompa=loompa#mark")
-    uri@ scheme copy() println()
+    uri@ query copy() println()
 }
